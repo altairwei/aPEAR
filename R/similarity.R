@@ -76,7 +76,8 @@ similarityCorrelation <- function(genes) {
 #' @param pathCol which column contains path descriptions (human readable text, not ids!)
 #' @param method a method to be used. Available values: \code{'jaccard'}, \code{'cosine'} and
 #' \code{'cor'}
-#' 
+#' @param compareCluster Is it a result generated from \link[clusterProfiler]{compareCluster}?
+#'
 #' @importFrom tibble deframe
 #' @importFrom dplyr %>%
 #' 
@@ -86,11 +87,12 @@ pathwaySimilarity <- function(
   enrichment,
   geneCol,
   pathCol = 'Description',
-  method = c('jaccard', 'cosine', 'cor')
+  method = c('jaccard', 'cosine', 'cor'),
+  compareCluster = FALSE
 ) {
   method <- match.arg(method)
 
-  genes <- getGenes(enrichment, geneCol, pathCol)
+  genes <- getGenes(enrichment, geneCol, pathCol, compareCluster)
 
   switch(method,
          'jaccard' = similarityJaccard(genes),
@@ -107,16 +109,26 @@ pathwaySimilarity <- function(
 #' @param enrichment a data frame containing enrichment results
 #' @param geneCol which column contains gene lists
 #' @param pathCol which column contains path descriptions (human readable text, not ids!)
+#' @param compareCluster Is it a result generated from \link[clusterProfiler]{compareCluster}?
 #'
 #' @export
 #'
-getGenes <- function(enrichment, geneCol, pathCol = 'Description') {
+getGenes <- function(enrichment, geneCol, pathCol = 'Description', compareCluster = FALSE) {
   cols <- c(pathCol, geneCol)
 
   stopifnot(!is.null(geneCol))
   stopifnot(all(cols %in% colnames(enrichment)))
 
-  enrichment[ , cols ] %>%
-    deframe %>%
-    lapply(\(x) strsplit(x, split = '/')[[1]])
+  if (compareCluster) {
+    enrichment$Cluster <- sub("\n.*", "", enrichment$Cluster)
+    # Combine gene IDs from different cluster
+    # Refer to enrichplot::pairwise_termsim.compareClusterResult
+    lapply(
+      split(enrichment, enrichment[[pathCol]]),
+      \(x) unique(unlist(strsplit(x[[geneCol]], "/"))))
+  } else {
+    enrichment[, cols] %>%
+      deframe %>%
+      lapply(\(x) strsplit(x, split = '/')[[1]])
+  }
 }

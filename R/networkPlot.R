@@ -81,7 +81,8 @@ enrichmentNetwork <- function(
 
   sim <- pathwaySimilarity(enrichment,
                            geneCol = params$genesCol,
-                           method = simMethod)
+                           method = simMethod,
+                           compareCluster = params$compareCluster)
 
   clusters <- findClusters(sim,
                            method = clustMethod,

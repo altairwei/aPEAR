@@ -79,6 +79,7 @@ validateEnrichment <- function(enrichment,
                                verbose = TRUE
 ) {
   enrichmentType <- NULL
+  compareCluster <- FALSE
 
   if (all(c('Description', 'pathwayGenes') %in% colnames(enrichment))) {
     enrichmentType <- 'custom'
@@ -105,6 +106,9 @@ validateEnrichment <- function(enrichment,
   }
 
   if (verbose) message('Detected enrichment type ', enrichmentType)
+
+  if ("Cluster" %in% colnames(enrichment))
+    compareCluster <- TRUE
 
   # Setting colorBy
   if (is.null(colorBy)) {
@@ -134,7 +138,8 @@ validateEnrichment <- function(enrichment,
     class = enrichmentType,
     colorBy = colorBy,
     nodeSize = nodeSize,
-    genesCol = genesCol
+    genesCol = genesCol,
+    compareCluster = compareCluster
   ))
 }
 
