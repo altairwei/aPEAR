@@ -132,9 +132,10 @@ findClustersHier <- function(sim,
 #' 
 findClustersSpectral <- function(sim, verbose = FALSE) {
   if (verbose) message('Using Spectral Clustering to detect pathway clusters...')
-  requireNamespace(Spectrum)
+  requireNamespace("Spectrum")
 
-  clusters <- Spectrum(sim, maxk = 100, showres = FALSE, silent = !verbose, clusteralg = 'km')
+  clusters <- Spectrum::Spectrum(
+    sim, maxk = 100, showres = FALSE, silent = !verbose, clusteralg = 'km')
   clusters <- clusters$assignments
   names(clusters) <- colnames(sim)
 
