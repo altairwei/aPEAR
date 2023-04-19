@@ -71,7 +71,7 @@ findClustersMarkov <- function(sim,
              allow1 = allow1)
 
   if (!('Cluster' %in% names(res))) {
-    stop('Unable to cluster data using Markov clustering algorithm.')
+    stop('Unable to cluster data using Markov clustering algorithm. ', res)
   }
 
   clusters <- res$Cluster
